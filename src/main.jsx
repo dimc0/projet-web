@@ -1,10 +1,17 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.jsx'
+import { createRoot } from "react-dom/client"
+import { useState } from "react"
+import { Connexion } from "./Connexion"
+import { Prospect } from "./Prospect"
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+function App() {
+  const [isConnected, setIsConnected] = useState(false)
+
+  return (
+    <>
+      {!isConnected && <Connexion onSuccess={() => setIsConnected(true)} />}
+      {isConnected && <Prospect />}
+    </>
+  )
+}
+
+createRoot(document.getElementById("root")).render(<App />)
