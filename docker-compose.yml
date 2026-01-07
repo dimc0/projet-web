@@ -20,6 +20,6 @@ services:
       MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "yes"
       MARIADB_DATABASE: crm
     ports:
-      - "3306:3306"
+      - "3310:3306"
     volumes:
       - ./db_data:/var/lib/mysql

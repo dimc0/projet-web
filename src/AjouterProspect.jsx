@@ -53,10 +53,9 @@ export function AjouterProspect({ setView, onAddProspect }) {
 
     setSuccess(true)
     
-    // Rediriger après 1.5 secondes
     setTimeout(() => {
       setView("prospects")
-    }, 1500)
+    }, 1000)
   }
 
   return (
@@ -85,8 +84,15 @@ export function AjouterProspect({ setView, onAddProspect }) {
         <input
           type="tel"
           name="phone"
-          placeholder="Téléphone *"
+          placeholder="Téléphone "
           value={formData.phone}
+          onChange={handleChange}
+        />
+
+        <input
+          type="status"
+          name="status"
+          placeholder="Status *"
           onChange={handleChange}
           required
         />

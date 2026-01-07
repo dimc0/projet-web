@@ -12,12 +12,10 @@ function App() {
   const [view, setView] = useState("prospects");
   const [selectedContactId, setSelectedContactId] = useState(null);
   const [prospects, setProspects] = useState(() => {
-    // Charger depuis localStorage ou utiliser les données initiales
     const saved = localStorage.getItem("prospects");
     return saved ? JSON.parse(saved) : initialProspects;
   });
 
-  // Sauvegarder dans localStorage à chaque changement
   useEffect(() => {
     localStorage.setItem("prospects", JSON.stringify(prospects));
   }, [prospects]);
@@ -65,4 +63,5 @@ function App() {
   );
 }
 
-createRoot(document.getElementById("root")).render(<App />);
+const root = createRoot(document.getElementById("root"));
+root.render(<App />);
