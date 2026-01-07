@@ -1,12 +1,14 @@
-import { prospects } from "./Prospect"
+import { prospects as defaultProspects } from "./Prospect"
 
-export function Clients({ setView, setSelectedContactId }) {
+export function Clients({ setView, setSelectedContactId, prospects = [] }) {
+  const displayProspects = prospects.length > 0 ? prospects : defaultProspects
+
   return (
     <div>
       <h1>Liste des clients</h1>
 
       <ul>
-        {prospects
+        {displayProspects
           .filter(p => p.status === "Client")
           .map(prospect => (
             <li

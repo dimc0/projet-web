@@ -1,7 +1,8 @@
-import { prospects } from "./Prospect"
+import { prospects as defaultProspects } from "./Prospect"
 
-export function Infocontact({ setView, idcontact }) {
-  const contact = prospects.find(p => p.id === idcontact)
+export function Infocontact({ setView, idcontact, prospects = [] }) {
+  const displayProspects = prospects.length > 0 ? prospects : defaultProspects
+  const contact = displayProspects.find(p => p.id === idcontact)
 
   if (!contact) {
     return <h2>Contact introuvable</h2>

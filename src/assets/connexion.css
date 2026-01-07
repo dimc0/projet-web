@@ -31,6 +31,32 @@
   border-color: #4f46e5;
 }
 
+.form select,
+.form textarea {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 1rem;
+  outline: none;
+  transition: border 0.2s;
+  font-family: inherit;
+}
+
+.form select:focus,
+.form textarea:focus {
+  border-color: #4f46e5;
+}
+
+.form textarea {
+  resize: vertical;
+}
+
+.form .error {
+  color: #ef4444;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
 .form button {
   padding: 12px;
   border-radius: 8px;

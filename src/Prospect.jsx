@@ -5,13 +5,26 @@ export const prospects = [
   { id: 4, name: "Léa", email: "luc@example.com", phone: "0611156311", source: "Salon", note: "Demande de rappel dans 1 semaine", status: "Prospect" }
 ]
 
-export function Prospect({ setView, setSelectedContactId }) {
+export function Prospect({ setView, setSelectedContactId, prospects: propsProspects = [] }) {
+  const displayProspects = propsProspects.length > 0 ? propsProspects : prospects
+
   return (
     <div>
       <h1>Liste des prospects</h1>
 
+      <button 
+        onClick={() => setView("ajouter-prospect")}
+        style={{ 
+          marginBottom: "1rem",
+          background: "#10b981",
+          color: "white"
+        }}
+      >
+        + Ajouter un prospect
+      </button>
+
       <ul>
-        {prospects
+        {displayProspects
           .filter(p => p.status === "Prospect")
           .map(prospect => (
             <li
