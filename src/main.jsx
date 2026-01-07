@@ -1,37 +1,76 @@
+// import { createRoot } from "react-dom/client";
+// import { useState } from "react";
+// import { Connexion } from "./Connexion";
+// import { Prospect } from "./Prospect";
+// import { Infocontact } from "./Infocontact";
+// import { AjouterProspect } from "./AjouterProspect";
+// import { Nav } from "./Nav";
+// // import { Clients } from "./Clients";
+
+// function App() {
+//   const [isConnected, setIsConnected] = useState(false);
+//   const [view, setView] = useState("prospects");
+//   const [selectedContactId, setSelectedContactId] = useState(null);
+
+//   return (
+//     <>
+//       {!isConnected && <Connexion onSuccess={() => setIsConnected(true)} />}
+
+//       {isConnected && <Nav setView={setView} />}
+
+//       {isConnected && view === "prospects" && (
+//         <Prospect setView={setView} setSelectedContactId={setSelectedContactId} />
+//       )}
+
+//       {isConnected && view === "infocontact" && (
+//         <Infocontact
+//           setView={setView}
+//           idcontact={selectedContactId}
+//         />
+//       )}
+
+//       {isConnected && view === "ajouter-prospect" && (
+//         <AjouterProspect setView={setView} />
+//       )}
+
+//       {isConnected && view === "rdv" && (
+//         <div>Rdv view not implemented yet</div>
+//       )}
+//     </>
+//   );
+// }
+
+// const root = createRoot(document.getElementById("root"));
+// root.render(<App />);
+
+
 import { createRoot } from "react-dom/client";
 import { useState, useEffect } from "react";
+
 import { Connexion } from "./Connexion";
 import { Prospect } from "./Prospect";
-import { Clients } from "./Clients";
 import { Infocontact } from "./Infocontact";
-import { AjouterProspect } from "./AjouterProspect";
-import { prospects as initialProspects } from "./Prospect";
+import { Nav } from "./Nav";
 
 function App() {
   const [isConnected, setIsConnected] = useState(false);
   const [view, setView] = useState("prospects");
   const [selectedContactId, setSelectedContactId] = useState(null);
-  const [prospects, setProspects] = useState(() => {
-    const saved = localStorage.getItem("prospects");
-    return saved ? JSON.parse(saved) : initialProspects;
-  });
+  const [prospects, setProspects] = useState([]);
 
+  // Charger les contacts via fetch
   useEffect(() => {
-    localStorage.setItem("prospects", JSON.stringify(prospects));
-  }, [prospects]);
-
-  const handleAddProspect = (newProspect) => {
-    const id = prospects.length > 0 ? Math.max(...prospects.map(p => p.id)) + 1 : 1;
-    const prospectToAdd = {
-      ...newProspect,
-      id
-    };
-    setProspects([...prospects, prospectToAdd]);
-  };
+    fetch("./../php/contacts.php")
+      .then(res => res.json())
+      .then(data => setProspects(data))
+      .catch(err => console.error(err));
+  }, []);
 
   return (
     <>
       {!isConnected && <Connexion onSuccess={() => setIsConnected(true)} />}
+
+      {isConnected && <Nav setView={setView} />}
 
       {isConnected && view === "prospects" && (
         <Prospect
@@ -41,24 +80,15 @@ function App() {
         />
       )}
 
-      {isConnected && view === "clients" && (
-        <Clients
+      {isConnected && view === "infocontact" && (
+        <Infocontact
           setView={setView}
-          setSelectedContactId={setSelectedContactId}
+          idcontact={selectedContactId}
           prospects={prospects}
         />
       )}
 
-      {isConnected && view === "infocontact" && (
-        <Infocontact setView={setView} idcontact={selectedContactId} prospects={prospects} />
-      )}
-
-      {isConnected && view === "ajouter-prospect" && (
-        <AjouterProspect
-          setView={setView}
-          onAddProspect={handleAddProspect}
-        />
-      )}
+      {isConnected && view === "rdv" && <div>Page RDV non faite</div>}
     </>
   );
 }

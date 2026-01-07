@@ -22,8 +22,6 @@ export function Clients({ setView, setSelectedContactId, prospects = [] }) {
             </li>
           ))}
       </ul>
-
-      <button onClick={() => setView("prospects")}>Retour prospects</button>
     </div>
   )
 }
