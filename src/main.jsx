@@ -52,19 +52,14 @@ import { Prospect } from "./Prospect";
 import { Infocontact } from "./Infocontact";
 import { Nav } from "./Nav";
 
+
 function App() {
   const [isConnected, setIsConnected] = useState(false);
   const [view, setView] = useState("prospects");
   const [selectedContactId, setSelectedContactId] = useState(null);
   const [prospects, setProspects] = useState([]);
 
-  // Charger les contacts via fetch
-  useEffect(() => {
-    fetch("./../php/contacts.php")
-      .then(res => res.json())
-      .then(data => setProspects(data))
-      .catch(err => console.error(err));
-  }, []);
+
 
   return (
     <>
@@ -95,3 +90,4 @@ function App() {
 
 const root = createRoot(document.getElementById("root"));
 root.render(<App />);
+
