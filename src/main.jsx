@@ -7,6 +7,7 @@ import { Clients } from "./Clients";
 import { AjouterProspect } from "./AjouterProspect";
 import { Infocontact } from "./Infocontact";
 import { Nav } from "./Nav";
+import { Editcontact } from "./Editcontact";
 
 function App() {
   const [isConnected, setIsConnected] = useState(false);
@@ -46,9 +47,32 @@ function App() {
     fetchAdmins();
   }, []);
 
-  // ==========================
-  // ADD PROSPECT
-  // ==========================
+   const handleUpdateProspect = (updatedProspect) => {
+    setContacts((prevContacts) =>
+      prevContacts.map((c) =>
+        c.id === updatedProspect.id ? { ...c, ...updatedProspect } : c
+      )
+    );
+  };
+
+  const handleDeleteProspect = async (id) => {
+  try {
+    const res = await fetch("http://localhost/crm/php/contacts.php", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error("Erreur suppression");
+
+    // Mettre à jour le state local
+    setContacts((prev) => prev.filter((c) => c.id !== id));
+  } catch (err) {
+    console.error("Erreur suppression :", err);
+  }
+};
+
+
   const handleAddProspect = async (newProspect) => {
     try {
       const res = await fetch("http://localhost/crm/php/contacts.php", {
@@ -77,23 +101,19 @@ function App() {
       // 🔄 Rafraîchissement automatique de la liste après ajout
       await fetchContacts();
       return result;
-
     } catch (err) {
       console.error("Erreur ajout prospect :", err);
       throw err;
     }
   };
 
-  const prospects = contacts.filter(c => c.id_status === 1);
-  const clients = contacts.filter(c => c.id_status === 2);
+  const prospects = contacts.filter((c) => c.id_status === 1);
+  const clients = contacts.filter((c) => c.id_status === 2);
 
   return (
     <>
       {!isConnected && (
-        <Connexion
-          onSuccess={() => setIsConnected(true)}
-          listeadmin={admins}
-        />
+        <Connexion onSuccess={() => setIsConnected(true)} listeadmin={admins} />
       )}
 
       {isConnected && <Nav setView={setView} />}
@@ -103,6 +123,7 @@ function App() {
           setView={setView}
           setSelectedContactId={setSelectedContactId}
           prospects={prospects}
+          onDeleteProspect={handleDeleteProspect}
         />
       )}
 
@@ -115,9 +136,14 @@ function App() {
       )}
 
       {isConnected && view === "ajouter-prospect" && (
-        <AjouterProspect
+        <AjouterProspect setView={setView} onAddProspect={handleAddProspect} />
+      )}
+
+      {view === "edit-prospect" && (
+        <Editcontact
           setView={setView}
-          onAddProspect={handleAddProspect}
+          prospect={contacts.find((c) => c.id === selectedContactId)}
+          onUpdateProspect={handleUpdateProspect} // maintenant défini
         />
       )}
 
