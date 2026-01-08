@@ -33,8 +33,8 @@ export function Prospect({
             <button
               type="button"
               onClick={(e) => {
-                e.stopPropagation(); // empêche le clic de remonter au <li>
-                if (onDeleteProspect) onDeleteProspect(p.id); // appelle la fonction passée depuis App
+                e.stopPropagation(); 
+                if (onDeleteProspect) onDeleteProspect(p.id); 
               }}
             >
               🗑️

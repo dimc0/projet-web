@@ -3,15 +3,34 @@ export function Clients({ setView, setSelectedContactId, prospects = [] }) {
     <div>
       <h1>Liste des clients</h1>
       <ul>
-        {prospects.map(c => (
+        {prospects.map((client) => (
           <li
-            key={c.id}
+            key={client.id}
             onClick={() => {
-              setSelectedContactId(c.id);
+              setSelectedContactId(client.id);
               setView("infocontact");
             }}
           >
-            {c.name}  -  {c.email}  -  {c.phone}
+            {client.name} - {client.email} - {client.phone}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedContactId(client.id);
+                setView("edit-prospect");
+              }}
+            >
+              ✏️
+            </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onDeleteProspect) onDeleteProspect(client.id);
+              }}
+            >
+              🗑️
+            </button>
           </li>
         ))}
       </ul>
