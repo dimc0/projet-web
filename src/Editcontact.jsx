@@ -16,7 +16,11 @@ export function Editcontact({ setView, prospect, onUpdateProspect, status }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "id_status" ? Number(value) : value,
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -30,6 +34,8 @@ export function Editcontact({ setView, prospect, onUpdateProspect, status }) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email))
       return setError("L'email n'est pas valide");
+    
+    console.log("DATA ENVOYÉE :", { ...formData, id: prospect.id });
 
     try {
       const res = await fetch("http://localhost/crm/php/contacts.php", {
@@ -98,9 +104,9 @@ export function Editcontact({ setView, prospect, onUpdateProspect, status }) {
 
           <div className="form-group">
             <label className="form-label">Source</label>
-            <select 
-              name="source" 
-              value={formData.source} 
+            <select
+              name="source"
+              value={formData.source}
               onChange={handleChange}
               className="form-select"
             >
@@ -115,9 +121,9 @@ export function Editcontact({ setView, prospect, onUpdateProspect, status }) {
 
           <div className="form-group">
             <label className="form-label">Statut</label>
-            <select 
-              name="id_status" 
-              value={formData.id_status} 
+            <select
+              name="id_status"
+              value={formData.id_status}
               onChange={handleChange}
               className="form-select"
             >
@@ -142,17 +148,21 @@ export function Editcontact({ setView, prospect, onUpdateProspect, status }) {
           </div>
 
           {error && <div className="message message-error">{error}</div>}
-          {success && <div className="message message-success">Prospect mis à jour !</div>}
+          {success && (
+            <div className="message message-success">Prospect mis à jour !</div>
+          )}
 
           <div className="form-actions">
-            <button 
-              type="button" 
+            <button
+              type="button"
               className="btn-secondary"
               onClick={() => setView("prospects")}
             >
               Annuler
             </button>
-            <button type="submit" className="btn-submit">Enregistrer</button>
+            <button type="submit" className="btn-submit">
+              Enregistrer
+            </button>
           </div>
         </form>
       </div>

@@ -52,7 +52,7 @@ export function Prospect({
                   }}
                   title="Modifier"
                 >
-                  Modifier
+                  ✏️
                 </button>
                 <button
                   type="button"
@@ -65,7 +65,7 @@ export function Prospect({
                   }}
                   title="Supprimer"
                 >
-                  Supprimer
+                  🗑️
                 </button>
               </div>
             </li>
