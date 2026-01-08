@@ -8,6 +8,7 @@ export function AjouterProspect({ setView, onAddProspect }) {
     phone: "",
     source: "Web",
     note: "",
+    status:"",
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -21,14 +22,14 @@ export function AjouterProspect({ setView, onAddProspect }) {
     e.preventDefault();
     setError("");
 
-    // Validation simple
+  
     if (!formData.name || !formData.email) {
       setError("Nom et email requis");
       return;
     }
 
     try {
-      await onAddProspect(formData); // ⚡ Appelle la fonction qui envoie au PHP
+      await onAddProspect(formData); 
       setSuccess(true);
       setTimeout(() => setView("prospects"), 1000);
     } catch (err) {
@@ -73,6 +74,11 @@ export function AjouterProspect({ setView, onAddProspect }) {
           <option value="Réseaux sociaux">Réseaux sociaux</option>
           <option value="Recommandation">Recommandation</option>
           <option value="Autre">Autre</option>
+        </select>
+
+
+        <select name="status" value={formData.source} onChange={handleChange}>
+          <option value=""></option>
         </select>
 
         <textarea

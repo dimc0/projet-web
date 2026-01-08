@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export function Editcontact({ setView, prospect, onUpdateProspect }) {
+export function Editcontact({ setView, prospect, onUpdateProspect, status }) {
   const [formData, setFormData] = useState({
     name: prospect.name || "",
     email: prospect.email || "",
@@ -15,10 +15,7 @@ export function Editcontact({ setView, prospect, onUpdateProspect }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -35,7 +32,7 @@ export function Editcontact({ setView, prospect, onUpdateProspect }) {
 
     try {
       const res = await fetch("http://localhost/crm/php/contacts.php", {
-        method: "PUT", 
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...formData, id: prospect.id }),
       });
@@ -43,8 +40,8 @@ export function Editcontact({ setView, prospect, onUpdateProspect }) {
       const data = await res.json();
       if (!data.success) throw new Error("Erreur serveur");
 
-      setSuccess(true);
       if (onUpdateProspect) onUpdateProspect({ ...formData, id: prospect.id });
+      setSuccess(true);
 
       setTimeout(() => setView("prospects"), 1000);
     } catch (err) {
@@ -60,27 +57,27 @@ export function Editcontact({ setView, prospect, onUpdateProspect }) {
       <input
         type="text"
         name="name"
-        placeholder="Nom *"
         value={formData.name}
         onChange={handleChange}
+        placeholder="Nom *"
         required
       />
 
       <input
         type="email"
         name="email"
-        placeholder="Email *"
         value={formData.email}
         onChange={handleChange}
+        placeholder="Email *"
         required
       />
 
       <input
         type="tel"
         name="phone"
-        placeholder="Téléphone *"
         value={formData.phone}
         onChange={handleChange}
+        placeholder="Téléphone *"
         required
       />
 
@@ -93,23 +90,29 @@ export function Editcontact({ setView, prospect, onUpdateProspect }) {
         <option value="Autre">Autre</option>
       </select>
 
+      <select name="id_status" value={formData.id_status} onChange={handleChange}>
+        {status.map((s) => (
+          <option key={s.id} value={s.id}>
+            {s.name}
+          </option>
+        ))}
+      </select>
+
       <textarea
         name="note"
-        placeholder="Note (optionnel)"
         value={formData.note}
         onChange={handleChange}
+        placeholder="Note"
         rows="4"
       />
 
       {error && <p>{error}</p>}
       {success && <p>Prospect mis à jour !</p>}
 
-      <div>
-        <button type="button" onClick={() => setView("prospects")}>
-          Annuler
-        </button>
-        <button type="submit">Enregistrer</button>
-      </div>
+      <button type="button" onClick={() => setView("prospects")}>
+        Annuler
+      </button>
+      <button type="submit">Enregistrer</button>
     </form>
   );
 }

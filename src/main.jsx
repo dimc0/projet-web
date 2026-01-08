@@ -15,10 +15,12 @@ function App() {
   const [selectedContactId, setSelectedContactId] = useState(null);
   const [contacts, setContacts] = useState([]);
   const [admins, setAdmins] = useState([]);
+  const [status, setStatus] = useState([]);
 
   // ==========================
   // FETCH CONTACTS
   // ==========================
+
   const fetchContacts = async () => {
     try {
       const res = await fetch("http://localhost/crm/php/contacts.php");
@@ -29,9 +31,17 @@ function App() {
     }
   };
 
-  // ==========================
-  // FETCH ADMINS
-  // ==========================
+  const fetchStatus = async () => {
+    try {
+      const res = await fetch("http://localhost/crm/php/status.php");
+      const data = await res.json();
+      setStatus(data);
+    } catch (err) {
+      console.error("Erreur fetch status :", err);
+    }
+  };
+
+
   const fetchAdmins = async () => {
     try {
       const res = await fetch("http://localhost/crm/php/admin.php");
@@ -45,9 +55,10 @@ function App() {
   useEffect(() => {
     fetchContacts();
     fetchAdmins();
+    fetchStatus();
   }, []);
 
-   const handleUpdateProspect = (updatedProspect) => {
+  const handleUpdateProspect = (updatedProspect) => {
     setContacts((prevContacts) =>
       prevContacts.map((c) =>
         c.id === updatedProspect.id ? { ...c, ...updatedProspect } : c
@@ -56,22 +67,21 @@ function App() {
   };
 
   const handleDeleteProspect = async (id) => {
-  try {
-    const res = await fetch("http://localhost/crm/php/contacts.php", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
-    });
-    const data = await res.json();
-    if (!data.success) throw new Error("Erreur suppression");
+    try {
+      const res = await fetch("http://localhost/crm/php/contacts.php", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error("Erreur suppression");
 
-    // Mettre à jour le state local
-    setContacts((prev) => prev.filter((c) => c.id !== id));
-  } catch (err) {
-    console.error("Erreur suppression :", err);
-  }
-};
-
+      // Mettre à jour le state local
+      setContacts((prev) => prev.filter((c) => c.id !== id));
+    } catch (err) {
+      console.error("Erreur suppression :", err);
+    }
+  };
 
   const handleAddProspect = async (newProspect) => {
     try {
@@ -143,7 +153,8 @@ function App() {
         <Editcontact
           setView={setView}
           prospect={contacts.find((c) => c.id === selectedContactId)}
-          onUpdateProspect={handleUpdateProspect} // maintenant défini
+          onUpdateProspect={handleUpdateProspect}
+          status={status}
         />
       )}
 
@@ -154,8 +165,6 @@ function App() {
           prospects={contacts}
         />
       )}
-
-      {isConnected && view === "rdv" && <div>Page RDV non faite</div>}
     </>
   );
 }
