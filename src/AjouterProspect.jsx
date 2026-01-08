@@ -1,5 +1,5 @@
-import { useState } from "react"
-import "./assets/connexion.css"
+import { useState } from "react";
+import "./assets/connexion.css";
 
 export function AjouterProspect({ setView, onAddProspect }) {
   const [formData, setFormData] = useState({
@@ -8,60 +8,39 @@ export function AjouterProspect({ setView, onAddProspect }) {
     phone: "",
     source: "Web",
     note: "",
-    status: "Prospect"
-  })
-  const [error, setError] = useState("")
-  const [success, setSuccess] = useState(false)
+  });
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
 
   const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
-  }
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    setError("")
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
 
-    // Validation
-    if (!formData.name.trim()) {
-      setError("Le nom est requis")
-      return
-    }
-    if (!formData.email.trim()) {
-      setError("L'email est requis")
-      return
-    }
-    if (!formData.phone.trim()) {
-      setError("Le téléphone est requis")
-      return
+    // Validation simple
+    if (!formData.name || !formData.email) {
+      setError("Nom et email requis");
+      return;
     }
 
-    // Validation email basique
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(formData.email)) {
-      setError("L'email n'est pas valide")
-      return
+    try {
+      await onAddProspect(formData); // ⚡ Appelle la fonction qui envoie au PHP
+      setSuccess(true);
+      setTimeout(() => setView("prospects"), 1000);
+    } catch (err) {
+      console.error(err);
+      setError("Impossible d'ajouter le prospect");
     }
-
-    // Ajouter le prospect
-    if (onAddProspect) {
-      onAddProspect(formData)
-    }
-
-    setSuccess(true)
-    
-    setTimeout(() => {
-      setView("prospects")
-    }, 1000)
-  }
+  };
 
   return (
     <div className="form">
       <form onSubmit={handleSubmit}>
-        <h2 style={{ marginTop: 0, marginBottom: "1rem", color: "#1a1a1a" }}>Ajouter un prospect</h2>
+        <h2>Ajouter un prospect</h2>
 
         <input
           type="text"
@@ -69,7 +48,6 @@ export function AjouterProspect({ setView, onAddProspect }) {
           placeholder="Nom *"
           value={formData.name}
           onChange={handleChange}
-          required
         />
 
         <input
@@ -78,30 +56,17 @@ export function AjouterProspect({ setView, onAddProspect }) {
           placeholder="Email *"
           value={formData.email}
           onChange={handleChange}
-          required
         />
 
         <input
           type="tel"
           name="phone"
-          placeholder="Téléphone "
+          placeholder="Téléphone"
           value={formData.phone}
           onChange={handleChange}
         />
 
-        <input
-          type="status"
-          name="status"
-          placeholder="Status *"
-          onChange={handleChange}
-          required
-        />
-
-        <select
-          name="source"
-          value={formData.source}
-          onChange={handleChange}
-        >
+        <select name="source" value={formData.source} onChange={handleChange}>
           <option value="Web">Web</option>
           <option value="Salon">Salon</option>
           <option value="Email">Email</option>
@@ -119,28 +84,15 @@ export function AjouterProspect({ setView, onAddProspect }) {
         />
 
         {error && <p className="error">{error}</p>}
-        
-        {success && (
-          <p style={{ color: "#10b981", margin: 0 }}>Prospect ajouté avec succès !</p>
-        )}
+        {success && <p style={{ color: "#10b981" }}>Prospect ajouté avec succès !</p>}
 
         <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
-          <button 
-            type="button" 
-            onClick={() => setView("prospects")}
-            style={{ 
-              background: "#6b7280",
-              flex: 1
-            }}
-          >
+          <button type="button" onClick={() => setView("prospects")}>
             Annuler
           </button>
-          <button type="submit" style={{ flex: 1 }}>
-            Ajouter
-          </button>
+          <button type="submit">Ajouter</button>
         </div>
       </form>
     </div>
-  )
+  );
 }
-

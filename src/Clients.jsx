@@ -1,27 +1,20 @@
-import { prospects as defaultProspects } from "./Prospect"
-
 export function Clients({ setView, setSelectedContactId, prospects = [] }) {
-  const displayProspects = prospects.length > 0 ? prospects : defaultProspects
-
   return (
     <div>
       <h1>Liste des clients</h1>
-
       <ul>
-        {displayProspects
-          .filter(p => p.status === "Client")
-          .map(prospect => (
-            <li
-              key={prospect.id}
-              onClick={() => {
-                setSelectedContactId(prospect.id)
-                setView("infocontact")
-              }}
-            >
-              {prospect.name} - {prospect.email} - {prospect.phone} - {prospect.status}
-            </li>
-          ))}
+        {prospects.map(c => (
+          <li
+            key={c.id}
+            onClick={() => {
+              setSelectedContactId(c.id);
+              setView("infocontact");
+            }}
+          >
+            {c.name}  -  {c.email}  -  {c.phone}
+          </li>
+        ))}
       </ul>
     </div>
-  )
+  );
 }

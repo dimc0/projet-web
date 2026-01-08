@@ -1,24 +1,36 @@
-import { useState } from "react"
-import "./assets/connexion.css"
+import { useState } from "react";
+import "./assets/connexion.css";
 
-export function Connexion({ onSuccess }) {
-  const admin = "test@test.com"
-  const password = "test"
+export function Connexion({ onSuccess, listeadmin }) {
 
-  const [emailInput, setEmailInput] = useState("")
-  const [passwordInput, setPasswordInput] = useState("")
-  const [error, setError] = useState("")
+  const [emailInput, setEmailInput] = useState("");
+  const [passwordInput, setPasswordInput] = useState("");
+  const [error, setError] = useState("");
+  console.log(listeadmin);
+  
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    if (emailInput !== admin || passwordInput !== password) {
-      setError("Email ou mot de passe incorrect")
-    } else {
-      setError("")
-      onSuccess() 
+   
+    console.log("📌 LISTEADMIN =", listeadmin);
+    console.log("📌 EMAIL SAISI =", emailInput);
+
+  const user = listeadmin.find((admin) => admin.email === emailInput);
+
+  console.log("📌 USER TROUVÉ =", user);
+
+    
+
+  
+    if (!user || user.password !== passwordInput) {
+      setError("Email ou mot de passe incorrect");
+      return;
     }
-  }
+
+    setError("");
+    onSuccess(user); 
+  };
 
   return (
     <div className="form">
@@ -42,5 +54,5 @@ export function Connexion({ onSuccess }) {
         <button type="submit">Connexion</button>
       </form>
     </div>
-  )
+  );
 }
