@@ -1,41 +1,20 @@
-import { useEffect, useState } from "react";
-
-export function Prospect({ setView, setSelectedContactId }) {
-  const [prospects, setProspects] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch("http://localhost/crm/php/contacts.php")
-      .then(res => res.json())
-      .then(data => {
-        setProspects(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error("Erreur fetch :", err);
-        setLoading(false);
-      });
-  }, []);
-
-  if (loading) return <div>Loading...</div>;
-
+export function Prospect({ setView, setSelectedContactId, prospects = [] }) {
   return (
     <div>
       <h1>Liste des prospects</h1>
+      <button onClick={() => setView("ajouter-prospect")}>Ajouter un prospect</button>
       <ul>
-        {prospects
-          .filter(p => p.id_status === 1) // ici on filtre les "prospects"
-          .map(prospect => (
-            <li
-              key={prospect.id}
-              onClick={() => {
-                setSelectedContactId(prospect.id);
-                setView("infocontact");
-              }}
-            >
-              {prospect.name} - {prospect.email} - {prospect.phone} ✏️
-            </li>
-          ))}
+        {prospects.map(p => (
+          <li
+            key={p.id}
+            onClick={() => {
+              setSelectedContactId(p.id);
+              setView("infocontact");
+            }}
+          >
+            {p.name} - {p.email} - {p.phone} ✏️
+          </li>
+        ))}
       </ul>
     </div>
   );
