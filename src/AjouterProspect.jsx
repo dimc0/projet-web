@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./assets/connexion.css";
+import "./assets/AjouterProspect.css";
 
 export function AjouterProspect({ setView, onAddProspect }) {
   const [formData, setFormData] = useState({
@@ -39,66 +39,93 @@ export function AjouterProspect({ setView, onAddProspect }) {
   };
 
   return (
-    <div className="form">
-      <form onSubmit={handleSubmit}>
-        <h2>Ajouter un prospect</h2>
+    <div className="form-container">
+      <div className="form-wrapper">
+        <h2 className="form-title">Ajouter un prospect</h2>
 
-        <input
-          type="text"
-          name="name"
-          placeholder="Nom *"
-          value={formData.name}
-          onChange={handleChange}
-        />
+        <form className="login-form" onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label className="form-label">Nom *</label>
+            <input
+              type="text"
+              name="name"
+              className="form-input"
+              placeholder="Nom complet"
+              value={formData.name}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Email *"
-          value={formData.email}
-          onChange={handleChange}
-        />
+          <div className="form-group">
+            <label className="form-label">Email *</label>
+            <input
+              type="email"
+              name="email"
+              className="form-input"
+              placeholder="email@exemple.com"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        <input
-          type="tel"
-          name="phone"
-          placeholder="Téléphone"
-          value={formData.phone}
-          onChange={handleChange}
-        />
+          <div className="form-group">
+            <label className="form-label">Téléphone</label>
+            <input
+              type="tel"
+              name="phone"
+              className="form-input"
+              placeholder="06 12 34 56 78"
+              value={formData.phone}
+              onChange={handleChange}
+            />
+          </div>
 
-        <select name="source" value={formData.source} onChange={handleChange}>
-          <option value="Web">Web</option>
-          <option value="Salon">Salon</option>
-          <option value="Email">Email</option>
-          <option value="Réseaux sociaux">Réseaux sociaux</option>
-          <option value="Recommandation">Recommandation</option>
-          <option value="Autre">Autre</option>
-        </select>
+          <div className="form-group">
+            <label className="form-label">Source</label>
+            <select 
+              name="source" 
+              value={formData.source} 
+              onChange={handleChange}
+              className="form-select"
+            >
+              <option value="Web">Web</option>
+              <option value="Salon">Salon</option>
+              <option value="Email">Email</option>
+              <option value="Réseaux sociaux">Réseaux sociaux</option>
+              <option value="Recommandation">Recommandation</option>
+              <option value="Autre">Autre</option>
+            </select>
+          </div>
 
+          <div className="form-group">
+            <label className="form-label">Note (optionnel)</label>
+            <textarea
+              name="note"
+              className="form-textarea"
+              placeholder="Ajoutez une note sur ce prospect..."
+              value={formData.note}
+              onChange={handleChange}
+              rows="4"
+            />
+          </div>
 
-        <select name="status" value={formData.source} onChange={handleChange}>
-          <option value=""></option>
-        </select>
+          {error && <div className="message message-error">{error}</div>}
+          {success && <div className="message message-success">Prospect ajouté avec succès !</div>}
 
-        <textarea
-          name="note"
-          placeholder="Note (optionnel)"
-          value={formData.note}
-          onChange={handleChange}
-          rows="4"
-        />
-
-        {error && <p className="error">{error}</p>}
-        {success && <p style={{ color: "#10b981" }}>Prospect ajouté avec succès !</p>}
-
-        <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
-          <button type="button" onClick={() => setView("prospects")}>
-            Annuler
-          </button>
-          <button type="submit">Ajouter</button>
-        </div>
-      </form>
+          <div className="form-actions">
+            <button 
+              type="button" 
+              className="btn-secondary"
+              onClick={() => setView("prospects")}
+            >
+              Annuler
+            </button>
+            <button type="submit" className="btn-submit">Ajouter</button>
+          </div>
+          </form>
+      </div>
     </div>
   );
 }
