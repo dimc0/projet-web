@@ -1,5 +1,6 @@
 import { createRoot } from "react-dom/client";
 import { useState, useEffect } from "react";
+import "./index.css";
 
 import { Connexion } from "./Connexion";
 import { Prospect } from "./Prospect";
@@ -126,7 +127,7 @@ function App() {
         <Connexion onSuccess={() => setIsConnected(true)} listeadmin={admins} />
       )}
 
-      {isConnected && <Nav setView={setView} />}
+      {isConnected && <Nav setView={setView} currentView={view} />}
 
       {isConnected && view === "prospects" && (
         <Prospect

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import "./assets/Editcontact.css";
 
 export function Editcontact({ setView, prospect, onUpdateProspect, status }) {
   const [formData, setFormData] = useState({
@@ -51,68 +52,110 @@ export function Editcontact({ setView, prospect, onUpdateProspect, status }) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Éditer le prospect</h2>
+    <div className="edit-container">
+      <div className="edit-wrapper">
+        <h2 className="edit-title">Éditer le prospect</h2>
 
-      <input
-        type="text"
-        name="name"
-        value={formData.name}
-        onChange={handleChange}
-        placeholder="Nom *"
-        required
-      />
+        <form className="login-form" onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label className="form-label">Nom *</label>
+            <input
+              type="text"
+              name="name"
+              className="form-input"
+              placeholder="Nom complet"
+              value={formData.name}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-      <input
-        type="email"
-        name="email"
-        value={formData.email}
-        onChange={handleChange}
-        placeholder="Email *"
-        required
-      />
+          <div className="form-group">
+            <label className="form-label">Email *</label>
+            <input
+              type="email"
+              name="email"
+              className="form-input"
+              placeholder="email@exemple.com"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-      <input
-        type="tel"
-        name="phone"
-        value={formData.phone}
-        onChange={handleChange}
-        placeholder="Téléphone *"
-        required
-      />
+          <div className="form-group">
+            <label className="form-label">Téléphone *</label>
+            <input
+              type="tel"
+              name="phone"
+              className="form-input"
+              placeholder="06 12 34 56 78"
+              value={formData.phone}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-      <select name="source" value={formData.source} onChange={handleChange}>
-        <option value="Web">Web</option>
-        <option value="Salon">Salon</option>
-        <option value="Email">Email</option>
-        <option value="Réseaux sociaux">Réseaux sociaux</option>
-        <option value="Recommandation">Recommandation</option>
-        <option value="Autre">Autre</option>
-      </select>
+          <div className="form-group">
+            <label className="form-label">Source</label>
+            <select 
+              name="source" 
+              value={formData.source} 
+              onChange={handleChange}
+              className="form-select"
+            >
+              <option value="Web">Web</option>
+              <option value="Salon">Salon</option>
+              <option value="Email">Email</option>
+              <option value="Réseaux sociaux">Réseaux sociaux</option>
+              <option value="Recommandation">Recommandation</option>
+              <option value="Autre">Autre</option>
+            </select>
+          </div>
 
-      <select name="id_status" value={formData.id_status} onChange={handleChange}>
-        {status.map((s) => (
-          <option key={s.id} value={s.id}>
-            {s.name}
-          </option>
-        ))}
-      </select>
+          <div className="form-group">
+            <label className="form-label">Statut</label>
+            <select 
+              name="id_status" 
+              value={formData.id_status} 
+              onChange={handleChange}
+              className="form-select"
+            >
+              {status.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+          </div>
 
-      <textarea
-        name="note"
-        value={formData.note}
-        onChange={handleChange}
-        placeholder="Note"
-        rows="4"
-      />
+          <div className="form-group">
+            <label className="form-label">Note (optionnel)</label>
+            <textarea
+              name="note"
+              className="form-textarea"
+              placeholder="Ajoutez une note sur ce prospect..."
+              value={formData.note}
+              onChange={handleChange}
+              rows="4"
+            />
+          </div>
 
-      {error && <p>{error}</p>}
-      {success && <p>Prospect mis à jour !</p>}
+          {error && <div className="message message-error">{error}</div>}
+          {success && <div className="message message-success">Prospect mis à jour !</div>}
 
-      <button type="button" onClick={() => setView("prospects")}>
-        Annuler
-      </button>
-      <button type="submit">Enregistrer</button>
-    </form>
+          <div className="form-actions">
+            <button 
+              type="button" 
+              className="btn-secondary"
+              onClick={() => setView("prospects")}
+            >
+              Annuler
+            </button>
+            <button type="submit" className="btn-submit">Enregistrer</button>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 }
