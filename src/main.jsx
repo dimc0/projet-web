@@ -15,7 +15,9 @@ function App() {
   const [contacts, setContacts] = useState([]);
   const [admins, setAdmins] = useState([]);
 
-  // ⚡ Récupération des contacts depuis PHP
+  // ==========================
+  // FETCH CONTACTS
+  // ==========================
   const fetchContacts = async () => {
     try {
       const res = await fetch("http://localhost/crm/php/contacts.php");
@@ -26,7 +28,9 @@ function App() {
     }
   };
 
-  // ⚡ Récupération des admins depuis PHP
+  // ==========================
+  // FETCH ADMINS
+  // ==========================
   const fetchAdmins = async () => {
     try {
       const res = await fetch("http://localhost/crm/php/admin.php");
@@ -42,7 +46,9 @@ function App() {
     fetchAdmins();
   }, []);
 
-  // ⚡ Ajouter un prospect côté React ET PHP
+  // ==========================
+  // ADD PROSPECT
+  // ==========================
   const handleAddProspect = async (newProspect) => {
     try {
       const res = await fetch("http://localhost/crm/php/contacts.php", {
@@ -51,16 +57,30 @@ function App() {
         body: JSON.stringify(newProspect),
       });
 
-      const result = await res.json();
-      if (result.success) {
-        // On récupère l'id automatiquement si tu veux gérer ça côté React
-        const nextId = contacts.length > 0 ? Math.max(...contacts.map(c => c.id)) + 1 : 1;
-        setContacts(prev => [...prev, { ...newProspect, id: nextId, id_status: 1 }]);
-      } else {
-        console.error("Erreur serveur :", result);
+      // DEBUG : voir ce que PHP renvoie exactement
+      const text = await res.text();
+      console.log("Réponse brute PHP :", text);
+
+      let result;
+      try {
+        result = JSON.parse(text);
+      } catch (e) {
+        console.error("Erreur parse JSON :", e, text);
+        throw new Error("Réponse PHP invalide JSON");
       }
+
+      if (!res.ok || !result.success) {
+        console.error("Erreur serveur :", result);
+        throw new Error(result.message || "Erreur ajout prospect");
+      }
+
+      // 🔄 Rafraîchissement automatique de la liste après ajout
+      await fetchContacts();
+      return result;
+
     } catch (err) {
-      console.error("Erreur fetch POST :", err);
+      console.error("Erreur ajout prospect :", err);
+      throw err;
     }
   };
 
@@ -69,7 +89,13 @@ function App() {
 
   return (
     <>
-      {!isConnected && <Connexion onSuccess={() => setIsConnected(true)} listeadmin={admins} />}
+      {!isConnected && (
+        <Connexion
+          onSuccess={() => setIsConnected(true)}
+          listeadmin={admins}
+        />
+      )}
+
       {isConnected && <Nav setView={setView} />}
 
       {isConnected && view === "prospects" && (
