@@ -11,13 +11,12 @@ export function AjouterRdv({ setView, onAddRdv, contacts }) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
-  // Mise à jour des champs
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Soumission
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
