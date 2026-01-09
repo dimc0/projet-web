@@ -53,6 +53,8 @@ export function Infocontact({ setView, idcontact, prospects }) {
           </div>
         </div>
 
+        
+
         <div className="info-actions">
           <button className="btn-back" onClick={() => setView("prospects")}>
             Retour

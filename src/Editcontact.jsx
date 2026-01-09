@@ -34,7 +34,7 @@ export function Editcontact({ setView, prospect, onUpdateProspect, status }) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email))
       return setError("L'email n'est pas valide");
-    
+
     console.log("DATA ENVOYÉE :", { ...formData, id: prospect.id });
 
     try {
@@ -118,22 +118,23 @@ export function Editcontact({ setView, prospect, onUpdateProspect, status }) {
               <option value="Autre">Autre</option>
             </select>
           </div>
-
-          <div className="form-group">
-            <label className="form-label">Statut</label>
-            <select
-              name="id_status"
-              value={formData.id_status}
-              onChange={handleChange}
-              className="form-select"
-            >
-              {status.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          {formData.id_status === 1 && (
+            <div className="form-group">
+              <label className="form-label">Statut</label>
+              <select
+                name="id_status"
+                value={formData.id_status}
+                onChange={handleChange}
+                className="form-select"
+              >
+                {status.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <div className="form-group">
             <label className="form-label">Note (optionnel)</label>
