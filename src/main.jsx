@@ -7,22 +7,34 @@ import { Prospect } from "./Prospect";
 import { Clients } from "./Clients";
 import { AjouterProspect } from "./AjouterProspect";
 import { Infocontact } from "./Infocontact";
-import { Nav } from "./Nav";
 import { Editcontact } from "./Editcontact";
+import { Nav } from "./Nav";
+
+import { AjouterRdv } from "./AjouterRdv";
+import { RdvList } from "./Rdv";
 
 function App() {
+  // =======================
+  // États principaux
+  // =======================
   const [isConnected, setIsConnected] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null); // <-- STOCK USER
-  const [view, setView] = useState("prospects");
+  const [currentUser, setCurrentUser] = useState(null);
+  const [view, setView] = useState("prospects"); // Vue courante
   const [selectedContactId, setSelectedContactId] = useState(null);
-  const [contacts, setContacts] = useState([]);
+
+  const [contacts, setContacts] = useState([]); // Liste complète des contacts
   const [admins, setAdmins] = useState([]);
   const [status, setStatus] = useState([]);
 
-  // ==========================
-  // FETCH CONTACTS
-  // ==========================
+  // =======================
+  // États RDV
+  // =======================
+  const [rdvList, setRdvList] = useState([]);
+  const [selectedRdv, setSelectedRdv] = useState(null);
 
+  // =======================
+  // FETCHS
+  // =======================
   const fetchContacts = async () => {
     try {
       const res = await fetch("http://localhost/crm/php/contacts.php");
@@ -53,13 +65,55 @@ function App() {
     }
   };
 
+  const fetchRdv = async () => {
+    try {
+      const res = await fetch("http://localhost/crm/php/rdv.php");
+      const data = await res.json();
+      setRdvList(data);
+    } catch (err) {
+      console.error("Erreur fetch RDV :", err);
+    }
+  };
+
   useEffect(() => {
     fetchContacts();
     fetchAdmins();
     fetchStatus();
+    fetchRdv();
   }, []);
 
-  // Mise à jour d'un prospect
+  // =======================
+  // Gestion Prospects
+  // =======================
+  const handleAddProspect = async (newProspect) => {
+    try {
+      const res = await fetch("http://localhost/crm/php/contacts.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newProspect),
+      });
+
+      const text = await res.text();
+      let result;
+      try {
+        result = JSON.parse(text);
+      } catch (e) {
+        console.error("Erreur parse JSON :", e, text);
+        throw new Error("Réponse PHP invalide JSON");
+      }
+
+      if (!res.ok || !result.success) {
+        throw new Error(result.message || "Erreur ajout prospect");
+      }
+
+      await fetchContacts();
+      return result;
+    } catch (err) {
+      console.error("Erreur ajout prospect :", err);
+      throw err;
+    }
+  };
+
   const handleUpdateProspect = (updatedProspect) => {
     setContacts((prev) =>
       prev.map((c) =>
@@ -68,7 +122,6 @@ function App() {
     );
   };
 
-  // Suppression d'un prospect
   const handleDeleteProspect = async (id) => {
     try {
       const res = await fetch("http://localhost/crm/php/contacts.php", {
@@ -85,43 +138,72 @@ function App() {
     }
   };
 
-  // Ajout d'un prospect
-  const handleAddProspect = async (newProspect) => {
+  // =======================
+  // Gestion RDV
+  // =======================
+  const handleAddRdv = async (newRdv) => {
     try {
-      const res = await fetch("http://localhost/crm/php/contacts.php", {
+      const res = await fetch("http://localhost/crm/php/rdv.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newProspect),
+        body: JSON.stringify(newRdv),
       });
+      const result = await res.json();
+      if (!result.success) throw new Error("Erreur ajout RDV");
 
-      const text = await res.text();
-      console.log("Réponse brute PHP :", text);
-
-      let result;
-      try {
-        result = JSON.parse(text);
-      } catch (e) {
-        console.error("Erreur parse JSON :", e, text);
-        throw new Error("Réponse PHP invalide JSON");
-      }
-
-      if (!res.ok || !result.success) {
-        console.error("Erreur serveur :", result);
-        throw new Error(result.message || "Erreur ajout prospect");
-      }
-
-      await fetchContacts();
-      return result;
+      await fetchRdv();
+      setView("rdv");
     } catch (err) {
-      console.error("Erreur ajout prospect :", err);
+      console.error(err);
       throw err;
     }
   };
 
+  const handleUpdateRdv = async (updatedRdv) => {
+    try {
+      const res = await fetch("http://localhost/crm/php/rdv.php", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedRdv),
+      });
+      const result = await res.json();
+      if (!result.success) throw new Error("Erreur mise à jour RDV");
+
+      await fetchRdv();
+      setSelectedRdv(null);
+      setView("rdv");
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  };
+
+  const handleDeleteRdv = async (id) => {
+    if (!window.confirm("Voulez-vous vraiment supprimer ce RDV ?")) return;
+    try {
+      const res = await fetch("http://localhost/crm/php/rdv.php", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      const result = await res.json();
+      if (!result.success) throw new Error("Erreur suppression RDV");
+
+      await fetchRdv();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // =======================
   // Séparation prospects / clients
+  // =======================
   const prospects = contacts.filter((c) => c.id_status === 1);
   const clients = contacts.filter((c) => c.id_status === 2);
 
+  // =======================
+  // RENDER
+  // =======================
   return (
     <>
       {!isConnected && (
@@ -129,19 +211,14 @@ function App() {
           listeadmin={admins}
           onSuccess={(admin) => {
             setIsConnected(true);
-            setCurrentUser(admin); // <-- USER CONNECTÉ
+            setCurrentUser(admin);
           }}
         />
       )}
 
-      {isConnected && (
-        <Nav
-          setView={setView}
-          currentView={view}
-          user={currentUser} // <-- PASSAGE À NAV
-        />
-      )}
+      {isConnected && <Nav setView={setView} currentView={view} user={currentUser} />}
 
+      {/* ---------- PROSPECTS ---------- */}
       {isConnected && view === "prospects" && (
         <Prospect
           setView={setView}
@@ -151,6 +228,7 @@ function App() {
         />
       )}
 
+      {/* ---------- CLIENTS ---------- */}
       {isConnected && view === "clients" && (
         <Clients
           setView={setView}
@@ -159,10 +237,12 @@ function App() {
         />
       )}
 
+      {/* ---------- AJOUTER PROSPECT ---------- */}
       {isConnected && view === "ajouter-prospect" && (
         <AjouterProspect setView={setView} onAddProspect={handleAddProspect} />
       )}
 
+      {/* ---------- EDIT PROSPECT ---------- */}
       {isConnected && view === "edit-prospect" && (
         <Editcontact
           setView={setView}
@@ -172,11 +252,42 @@ function App() {
         />
       )}
 
+      {/* ---------- INFO CONTACT ---------- */}
       {isConnected && view === "infocontact" && (
         <Infocontact
           setView={setView}
           idcontact={selectedContactId}
           prospects={contacts}
+        />
+      )}
+
+      {/* ---------- LISTE RDV ---------- */}
+      {isConnected && view === "rdv" && (
+        <RdvList
+          rdv={rdvList}
+          contacts={contacts}
+          onEdit={(r) => {
+            setSelectedRdv(r);
+            setView("ajouter-rdv");
+          }}
+          onDelete={handleDeleteRdv}
+          onAdd={() => {
+            setSelectedRdv(null);
+            setView("ajouter-rdv");
+          }}
+        />
+      )}
+
+      {/* ---------- AJOUTER / MODIFIER RDV ---------- */}
+      {isConnected && view === "ajouter-rdv" && (
+        <AjouterRdv
+          contacts={contacts}
+          rdv={selectedRdv}
+          onSave={selectedRdv ? handleUpdateRdv : handleAddRdv}
+          onCancel={() => {
+            setSelectedRdv(null);
+            setView("rdv");
+          }}
         />
       )}
     </>
