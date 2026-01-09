@@ -12,6 +12,7 @@ import { Editcontact } from "./Editcontact";
 
 function App() {
   const [isConnected, setIsConnected] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null); // <-- STOCK USER
   const [view, setView] = useState("prospects");
   const [selectedContactId, setSelectedContactId] = useState(null);
   const [contacts, setContacts] = useState([]);
@@ -42,7 +43,6 @@ function App() {
     }
   };
 
-
   const fetchAdmins = async () => {
     try {
       const res = await fetch("http://localhost/crm/php/admin.php");
@@ -59,14 +59,16 @@ function App() {
     fetchStatus();
   }, []);
 
+  // Mise à jour d'un prospect
   const handleUpdateProspect = (updatedProspect) => {
-    setContacts((prevContacts) =>
-      prevContacts.map((c) =>
+    setContacts((prev) =>
+      prev.map((c) =>
         c.id === updatedProspect.id ? { ...c, ...updatedProspect } : c
       )
     );
   };
 
+  // Suppression d'un prospect
   const handleDeleteProspect = async (id) => {
     try {
       const res = await fetch("http://localhost/crm/php/contacts.php", {
@@ -77,13 +79,13 @@ function App() {
       const data = await res.json();
       if (!data.success) throw new Error("Erreur suppression");
 
-      // Mettre à jour le state local
       setContacts((prev) => prev.filter((c) => c.id !== id));
     } catch (err) {
       console.error("Erreur suppression :", err);
     }
   };
 
+  // Ajout d'un prospect
   const handleAddProspect = async (newProspect) => {
     try {
       const res = await fetch("http://localhost/crm/php/contacts.php", {
@@ -92,7 +94,6 @@ function App() {
         body: JSON.stringify(newProspect),
       });
 
-      // DEBUG : voir ce que PHP renvoie exactement
       const text = await res.text();
       console.log("Réponse brute PHP :", text);
 
@@ -109,7 +110,6 @@ function App() {
         throw new Error(result.message || "Erreur ajout prospect");
       }
 
-      // 🔄 Rafraîchissement automatique de la liste après ajout
       await fetchContacts();
       return result;
     } catch (err) {
@@ -118,16 +118,29 @@ function App() {
     }
   };
 
+  // Séparation prospects / clients
   const prospects = contacts.filter((c) => c.id_status === 1);
   const clients = contacts.filter((c) => c.id_status === 2);
 
   return (
     <>
       {!isConnected && (
-        <Connexion onSuccess={() => setIsConnected(true)} listeadmin={admins} />
+        <Connexion
+          listeadmin={admins}
+          onSuccess={(admin) => {
+            setIsConnected(true);
+            setCurrentUser(admin); // <-- USER CONNECTÉ
+          }}
+        />
       )}
 
-      {isConnected && <Nav setView={setView} currentView={view} />}
+      {isConnected && (
+        <Nav
+          setView={setView}
+          currentView={view}
+          user={currentUser} // <-- PASSAGE À NAV
+        />
+      )}
 
       {isConnected && view === "prospects" && (
         <Prospect
@@ -150,7 +163,7 @@ function App() {
         <AjouterProspect setView={setView} onAddProspect={handleAddProspect} />
       )}
 
-      {view === "edit-prospect" && (
+      {isConnected && view === "edit-prospect" && (
         <Editcontact
           setView={setView}
           prospect={contacts.find((c) => c.id === selectedContactId)}
