@@ -135,9 +135,6 @@ export function App() {
     }
   };
 
-  // =======================
-  // Gestion RDV
-  // =======================
   const handleAddRdv = async (newRdv) => {
     try {
       const res = await fetch("http://localhost/crm/php/rdv.php", {
@@ -176,7 +173,6 @@ export function App() {
   };
 
   const handleDeleteRdv = async (id) => {
-    if (!window.confirm("Voulez-vous vraiment supprimer ce RDV ?")) return;
     try {
       const res = await fetch("http://localhost/crm/php/rdv.php", {
         method: "DELETE",
@@ -265,24 +261,22 @@ export function App() {
         />
       )}
 
-      {/* ---------- LISTE RDV ---------- */}
       {isConnected && view === "rdv" && (
         <RdvList
           rdv={rdvList}
           contacts={contacts}
-          onEdit={(r) => {
+          onEditRdv={(r) => {
             setSelectedRdv(r);
             setView("ajouter-rdv");
           }}
-          onDelete={handleDeleteRdv}
-          onAdd={() => {
+          onDeleteRdv={handleDeleteRdv}
+          onAddRdv={() => {
             setSelectedRdv(null);
             setView("ajouter-rdv");
           }}
         />
       )}
 
-      {/* ---------- AJOUTER / MODIFIER RDV ---------- */}
       {isConnected && view === "ajouter-rdv" && (
         <AjouterRdv
           contacts={contacts}
