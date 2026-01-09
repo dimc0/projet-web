@@ -40,7 +40,6 @@ export function RdvList({ rdv = [], onEditRdv, onDeleteRdv, setView }) {
                   </div>
                 </div>
                 <div className="rdv-actions">
-                  <button onClick={() => onEditRdv && onEditRdv(r)}>✏️</button>
                   <button onClick={() => onDeleteRdv && onDeleteRdv(r.id)}>🗑️</button>
                 </div>
               </li>

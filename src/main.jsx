@@ -156,7 +156,7 @@ export function App() {
         <RdvList
           rdv={rdvList}
           setView={setView}
-          onEditRdv={(r) => { setSelectedRdv(r); setView("ajouter-rdv"); }}
+          onEditRdv={(r) => { setSelectedRdv(r); setView("edit-rdv"); }}
           onDeleteRdv={handleDeleteRdv}
         />
       )}
