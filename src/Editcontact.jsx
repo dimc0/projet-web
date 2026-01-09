@@ -118,6 +118,7 @@ export function Editcontact({ setView, prospect, onUpdateProspect, status }) {
               <option value="Autre">Autre</option>
             </select>
           </div>
+          
           {formData.id_status === 1 && (
             <div className="form-group">
               <label className="form-label">Statut</label>
