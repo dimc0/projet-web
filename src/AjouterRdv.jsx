@@ -1,53 +1,64 @@
 import { useState, useEffect } from "react";
 import "./assets/AjouterRdv.css";
 
-export function AjouterRdv({ contacts, rdv, onSave, onCancel }) {
+export function AjouterRdv({ contacts = [], rdv, onSave, onCancel }) {
+  // -------------------------------
+  // 1️⃣ État local pour le formulaire
+  // -------------------------------
   const [formData, setFormData] = useState({
     id_contact: "",
     place: "",
     schedule: "",
   });
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");   // pour afficher les erreurs
+  const [loading, setLoading] = useState(false); // état "enregistrement"
 
+  // -------------------------------
+  // 2️⃣ Pré-remplissage si on édite un RDV
+  // -------------------------------
   useEffect(() => {
     if (rdv) {
-      // Format datetime-local pour l'input (format: YYYY-MM-DDTHH:MM)
-      // La date vient de la base au format "YYYY-MM-DD HH:MM"
-      const scheduleDate = new Date(rdv.schedule.replace(' ', 'T'));
-      // Ajuster pour le fuseau horaire local
-      const localDate = new Date(scheduleDate.getTime() - scheduleDate.getTimezoneOffset() * 60000);
+      // On transforme la date SQL "YYYY-MM-DD HH:MM" en format input datetime-local
+      const scheduleDate = new Date(rdv.schedule.replace(" ", "T"));
+      const localDate = new Date(
+        scheduleDate.getTime() - scheduleDate.getTimezoneOffset() * 60000
+      );
       const formattedDate = localDate.toISOString().slice(0, 16);
-      
+
       setFormData({
         id_contact: rdv.id_contact.toString(),
         place: rdv.place || "",
         schedule: formattedDate,
       });
     } else {
-      // Valeur par défaut : maintenant + 1 heure
+      // Nouveau RDV : valeur par défaut maintenant + 1h
       const defaultDate = new Date();
-      defaultDate.setHours(defaultDate.getHours() + 1);
-      defaultDate.setMinutes(0);
-      const formattedDate = defaultDate.toISOString().slice(0, 16);
+      defaultDate.setHours(defaultDate.getHours() + 1, 0, 0, 0);
       setFormData({
         id_contact: "",
         place: "",
-        schedule: formattedDate,
+        schedule: defaultDate.toISOString().slice(0, 16),
       });
     }
   }, [rdv]);
 
+  // -------------------------------
+  // 3️⃣ Gestion des changements de champ
+  // -------------------------------
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // -------------------------------
+  // 4️⃣ Soumission du formulaire
+  // -------------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
+    // Validation simple
     if (!formData.id_contact || !formData.place || !formData.schedule) {
       setError("Tous les champs sont requis");
       setLoading(false);
@@ -55,14 +66,13 @@ export function AjouterRdv({ contacts, rdv, onSave, onCancel }) {
     }
 
     try {
-      // Convertir la date au format attendu par la base de données (YYYY-MM-DD HH:MM)
-      const scheduleDate = new Date(formData.schedule);
-      const year = scheduleDate.getFullYear();
-      const month = String(scheduleDate.getMonth() + 1).padStart(2, '0');
-      const day = String(scheduleDate.getDate()).padStart(2, '0');
-      const hours = String(scheduleDate.getHours()).padStart(2, '0');
-      const minutes = String(scheduleDate.getMinutes()).padStart(2, '0');
-      const formattedSchedule = `${year}-${month}-${day} ${hours}:${minutes}`;
+      // On convertit la date en format SQL "YYYY-MM-DD HH:MM"
+      const d = new Date(formData.schedule);
+      const formattedSchedule = `${d.getFullYear()}-${String(
+        d.getMonth() + 1
+      ).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")} ${String(
+        d.getHours()
+      ).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 
       const dataToSend = {
         ...formData,
@@ -70,11 +80,9 @@ export function AjouterRdv({ contacts, rdv, onSave, onCancel }) {
         schedule: formattedSchedule,
       };
 
-      if (rdv) {
-        dataToSend.id = rdv.id;
-      }
+      if (rdv) dataToSend.id = rdv.id; // si modification, ajouter l'ID
 
-      await onSave(dataToSend);
+      await onSave(dataToSend); // appel à la fonction passée depuis App
     } catch (err) {
       setError("Erreur lors de l'enregistrement");
       console.error(err);
@@ -83,73 +91,67 @@ export function AjouterRdv({ contacts, rdv, onSave, onCancel }) {
     }
   };
 
+  // -------------------------------
+  // 5️⃣ JSX du composant
+  // -------------------------------
   return (
     <div className="ajouter-rdv-container">
       <div className="ajouter-rdv-wrapper">
-        <h2 className="ajouter-rdv-title">
-          {rdv ? "Modifier le rendez-vous" : "Nouveau rendez-vous"}
-        </h2>
+        <h2>{rdv ? "Modifier le rendez-vous" : "Nouveau rendez-vous"}</h2>
 
-        <form className="ajouter-rdv-form" onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="ajouter-rdv-form">
+          {/* Sélection du contact */}
           <div className="form-group">
-            <label className="form-label">Contact *</label>
+            <label>Contact *</label>
             <select
               name="id_contact"
               value={formData.id_contact}
               onChange={handleChange}
-              className="form-select"
               required
             >
               <option value="">Sélectionner un contact</option>
-              {contacts.map((contact) => (
-                <option key={contact.id} value={contact.id}>
-                  {contact.name} - {contact.email}
+              {contacts.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name} - {c.email}
                 </option>
               ))}
             </select>
           </div>
 
+          {/* Lieu */}
           <div className="form-group">
-            <label className="form-label">Lieu *</label>
+            <label>Lieu *</label>
             <input
               type="text"
               name="place"
-              className="form-input"
-              placeholder="Ex: Bureau client, Visioconférence, Café..."
               value={formData.place}
               onChange={handleChange}
+              placeholder="Ex: Bureau client, Visioconférence, Café..."
               required
             />
           </div>
 
+          {/* Date et heure */}
           <div className="form-group">
-            <label className="form-label">Date et heure *</label>
+            <label>Date et heure *</label>
             <input
               type="datetime-local"
               name="schedule"
-              className="form-input"
               value={formData.schedule}
               onChange={handleChange}
               required
             />
           </div>
 
-          {error && <div className="message message-error">{error}</div>}
+          {/* Message d'erreur */}
+          {error && <div className="message-error">{error}</div>}
 
+          {/* Boutons */}
           <div className="form-actions">
-            <button
-              type="button"
-              className="btn-secondary"
-              onClick={onCancel}
-              disabled={loading}
-            >
+            <button type="button" onClick={onCancel} disabled={loading}>
               Annuler
             </button>
-            <button
-              type="submit"
-              className="btn-submit"
-              disabled={loading}
-            >
+            <button type="submit" disabled={loading}>
               {loading ? "Enregistrement..." : rdv ? "Modifier" : "Créer"}
             </button>
           </div>
@@ -158,4 +160,3 @@ export function AjouterRdv({ contacts, rdv, onSave, onCancel }) {
     </div>
   );
 }
-
