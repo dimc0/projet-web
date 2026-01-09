@@ -1,15 +1,17 @@
-import "./assets/Nav.css"
-export function Nav({ setView, currentView, user }) {
+import "./assets/Nav.css";
+
+export function Nav({ setView, currentView, user, setIsConnected }) {
   return (
     <nav className="nav">
       <div className="nav-container">
-
         <div className="nav-logo">CRM</div>
 
         <ul className="nav-menu">
           <li className="nav-item">
             <div
-              className={`nav-link ${currentView === "prospects" ? "active" : ""}`}
+              className={`nav-link ${
+                currentView === "prospects" ? "active" : ""
+              }`}
               onClick={() => setView("prospects")}
             >
               Prospects
@@ -18,7 +20,9 @@ export function Nav({ setView, currentView, user }) {
 
           <li className="nav-item">
             <div
-              className={`nav-link ${currentView === "clients" ? "active" : ""}`}
+              className={`nav-link ${
+                currentView === "clients" ? "active" : ""
+              }`}
               onClick={() => setView("clients")}
             >
               Clients
@@ -37,8 +41,15 @@ export function Nav({ setView, currentView, user }) {
 
         <div className="nav-user">
           Bienvenue : <span>{user?.name}</span>
+          <div>
+            <button
+              className="nav-user-action"
+              onClick={() => setIsConnected(false)}
+            >
+              deconnexion 🚪
+            </button>
+          </div>
         </div>
-
       </div>
     </nav>
   );
