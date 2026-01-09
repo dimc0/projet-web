@@ -13,7 +13,7 @@ export function Editcontact({ setView, prospect, onUpdateProspect, status }) {
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-
+ 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -118,7 +118,7 @@ export function Editcontact({ setView, prospect, onUpdateProspect, status }) {
               <option value="Autre">Autre</option>
             </select>
           </div>
-          
+
           {formData.id_status === 1 && (
             <div className="form-group">
               <label className="form-label">Statut</label>
