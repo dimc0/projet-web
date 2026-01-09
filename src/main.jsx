@@ -13,10 +13,7 @@ import { Nav } from "./Nav";
 import { AjouterRdv } from "./AjouterRdv";
 import { RdvList } from "./Rdv";
 
-function App() {
-  // =======================
-  // États principaux
-  // =======================
+export function App() {
   const [isConnected, setIsConnected] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [view, setView] = useState("prospects"); // Vue courante
@@ -216,7 +213,14 @@ function App() {
         />
       )}
 
-      {isConnected && <Nav setView={setView} currentView={view} user={currentUser} />}
+      {isConnected && (
+        <Nav
+          setView={setView}
+          currentView={view}
+          user={currentUser}
+          setIsConnected={setIsConnected}
+        />
+      )}
 
       {/* ---------- PROSPECTS ---------- */}
       {isConnected && view === "prospects" && (
