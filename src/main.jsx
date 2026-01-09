@@ -10,7 +10,7 @@ import { Infocontact } from "./Infocontact";
 import { Nav } from "./Nav";
 import { Editcontact } from "./Editcontact";
 
-function App() {
+export function App() {
   const [isConnected, setIsConnected] = useState(false);
   const [currentUser, setCurrentUser] = useState(null); // <-- STOCK USER
   const [view, setView] = useState("prospects");
@@ -129,7 +129,7 @@ function App() {
           listeadmin={admins}
           onSuccess={(admin) => {
             setIsConnected(true);
-            setCurrentUser(admin); // <-- USER CONNECTÉ
+            setCurrentUser(admin);
           }}
         />
       )}
@@ -138,7 +138,8 @@ function App() {
         <Nav
           setView={setView}
           currentView={view}
-          user={currentUser} // <-- PASSAGE À NAV
+          user={currentUser}
+          setIsConnected={setIsConnected}
         />
       )}
 
